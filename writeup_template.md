@@ -96,7 +96,7 @@ First I have calculated meters per pixel in x and y direction,. Then I have plot
  
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I have implement this in cell no 27 in my jupyter notebook I have used weighted_img() from the last project to plot the lane.
+I have implement this in cell no 14 in my jupyter notebook I have used weighted_img() from the last project to plot the lane.
 
 ![alt text][image6]
 
