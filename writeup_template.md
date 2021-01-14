@@ -20,12 +20,12 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./examples/undistort_output.png "Undistorted"
-[image2]: ./test_images/test1.jpg "Road Transformed"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+[image2]: ./output_images/undistorted_0.jpg "Road Transformed"
+[image3]: ./output_images/binary_1.jpg "Binary Example"
+[image4]: ./output_images/undistorted_and_warped_1.jpg "Warp Example"
+[image5]: ./output_images/lanes_polyfit.jpg "Fit Visual"
+[image6]: ./output_images/output_1.jpg "Output"
+[video1]: ./project_video_output.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
@@ -60,28 +60,13 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
-
+In *pipeline() function* I have read the image in HLS and seperated the H.L.S component. Then I have taken derivative in x and y direction 
+using sobel transform. Then I have set threshold in each of h,l,s paramenter and for x and y derivative. after that I have created a binary image(image with 1's 0's). Logic used for creating a binary image is if a pixel value is between the threshold value set it to 1 else set it to 0. Below is an example of binary image.
 ![alt text][image3]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
-
-```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-```
-
-This resulted in the following source and destination points:
+I have warp() function in my code which is used for perspective transform I have used below Source point as src and used used offest as 1/4th of original size.
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
@@ -96,17 +81,22 @@ I verified that my perspective transform was working as expected by drawing the 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+I have found lane pixel in find_lane_pixels(binary_warped) function, in this function i have calucalted left lane base position and right lane base position using the argmax of historgram on both side from the mid point. No I have created and window (9) and of 100 pixel width.
+.Now I have iterated through each window and found the pixel value within the current window which are non-zero in the given window. Whenever we found there are more than 50 pixels I have shifted the base lane position to the mean position of these non-zero pixel.
+After finding these nonzero pixels I have ploted a curve of order 2 in fit_polynomial function.
+Below is the example image.
+
 
 ![alt text][image5]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
-
+I have calculated radius in measure_curvature_real(binary_warped) function. 
+First I have calculated meters per pixel in x and y direction,. Then I have plot the left lane and right lane with pixel per meter bias included, after that I have calucalated radius of curve using the formula shared in videos.
+ 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I have implement this in cell no 27 in my jupyter notebook I have used weighted_img() from the last project to plot the lane.
 
 ![alt text][image6]
 
@@ -116,7 +106,7 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./project_video_output.mp4)
 
 ---
 
@@ -124,4 +114,4 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+My code fialed on challenge videos, one of the reason I found is because of more bendy curves, one of the solution I thought is to decrease the are of intereset so that we can decrease the amount of curve but at the same time we have to increase the amount of processing to mkae it work in real time. Also there are many exceptions in the code which needs to be handled to make it work in any scenarios.
